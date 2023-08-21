@@ -14,11 +14,12 @@ import { TagsModule } from './modules/tags/tags.module';
 import { TagTopicModule } from './modules/tag_topic/tag_topic.module';
 import { ChatService } from './modules/chat/services/chat.service';
 import { UserToTopicModule } from './modules/user_to_topic/user_to_topic.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 
 @Module({
   imports: [TypeOrmModule.forRoot(databaseConfig), // Connect to the database
-  ChatModule, UsersModule, RolesModule, RolePermissionModule, PermissionsModule, TopicsModule, TopicContentsModule, UserTagModule, TagsModule, TagTopicModule, UserToTopicModule],
+  ChatModule, UsersModule, RolesModule, RolePermissionModule, PermissionsModule, TopicsModule, TopicContentsModule, UserTagModule, TagsModule, TagTopicModule, UserToTopicModule, AuthModule],
   controllers: [],
   providers: [ChatService],
 })
