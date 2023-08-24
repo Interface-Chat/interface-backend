@@ -25,6 +25,9 @@ export class User extends BaseEntity{
   @Column()
   password: string;
 
+  @Column()
+  CreateAT: Date;
+
   @ManyToOne(() => Role, (role) => role.id)
   role: Role;
 

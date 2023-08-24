@@ -6,7 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService:UsersService, private jwtService:JwtService) { }
+    constructor(
+        private usersService:UsersService,
+        private jwtService:JwtService
+    ) { }
 
     async login(authLoginDto: UserLoginDto) {
         const user = await this.validateUser(authLoginDto);
@@ -24,6 +27,9 @@ export class AuthService {
         const { email, password } = userLoginDto;
 
         const user = await this.usersService.findUserByEmail(email);
+        // if(user && await user.validatePassword){
+        //     return user;
+        // }
         if (!(await user.validatePassword(password))) {
             throw new UnauthorizedException();
         }

@@ -8,17 +8,25 @@ import { CreaetUserType } from 'src/utils/types';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User)private usersRepositiry:Repository<User>){
+  constructor(@InjectRepository(User)private usersRepositiry:Repository<User>){ }
 
+  findUsers(){
+    return this.usersRepositiry.find();
   }
+  //Create User 
   async createUser(createUserType:CreaetUserType): Promise<User>{
-    const user = await this.usersRepositiry.create(createUserType);
+    const user = await this.usersRepositiry.create({
+      ...createUserType,
+      CreateAT : new Date(),
+      
+    });
     await user.save();
 
     delete user.password;
     return user;
   }
   
+
   async findUserByEmail(email: string){
     return await User.findOne({
       where: {
