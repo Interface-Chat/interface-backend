@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -16,7 +16,7 @@ export class UsersService {
     return this.usersRepositiry.find();
   }
   //Create User 
-  async createUser(createUserType:CreaetUserType): Promise<User>{
+  async createUser(createUserType:CreateUserDto): Promise<User>{
     const user = await this.usersRepositiry.create({
       ...createUserType,
       CreateAT : new Date(),

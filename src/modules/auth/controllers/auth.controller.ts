@@ -1,7 +1,9 @@
-import { Controller,Post,Body,Patch, Param } from '@nestjs/common';
+import { Controller,Post,Body,Patch, Param, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { UserLoginDto } from '../dtos/user_login.dto';
 import { UpdateUserType } from 'src/utils/update_type';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import {Request} from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -22,5 +24,12 @@ export class AuthController {
     ){
         await this.authService.resetPassword(resetPassword)
     }
+    @UseGuards(JwtAuthGuard)
+    @Get('/me')
+    async test(@Req() req: Request){
+        return req.user;
+    }
+
+    
 
 }

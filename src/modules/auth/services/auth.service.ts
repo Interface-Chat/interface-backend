@@ -38,6 +38,16 @@ export class AuthService {
         }
         return user ;
     }
+    
+
+    // verifyToken(token: string): any {
+    //     try {
+    //       const decoded = this.jwtService.verify(token);
+    //       return decoded;
+    //     } catch (error) {
+    //       throw new Error('Token verification failed');
+    //     }
+    //   }
 
 
     //reset password
