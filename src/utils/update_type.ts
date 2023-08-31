@@ -1,9 +1,6 @@
-import { IsEmail } from "class-validator";
-
-export class CreateUserDto {
+export type UpdateUserType={
     username:string;
     fullname:string;
-    @IsEmail()
     email:string;
     mobile:string;
     password:string;
