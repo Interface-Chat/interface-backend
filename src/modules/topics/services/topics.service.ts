@@ -1,26 +1,60 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Topic } from '../entities/topic.entity';
+import { UserToTopic } from 'src/modules/user_to_topic/entities/user_to_topic.entity';
 import { CreateTopicDto } from '../dto/create-topic.dto';
 import { UpdateTopicDto } from '../dto/update-topic.dto';
+import { UsersService } from 'src/modules/users/services/users.service';
 
 @Injectable()
 export class TopicsService {
-  create(createTopicDto: CreateTopicDto) {
-    return 'This action adds a new topic';
+  constructor(
+    @InjectRepository(Topic)
+    private topicRepository: Repository<Topic>,
+    // private readonly userService: UsersService,
+    // @InjectRepository(UserToTopic) // Inject the UserToTopic repository
+    // private readonly userToTopicRepository: Repository<UserToTopic>,
+  ) {}
+
+  // async createWithUsers(createTopicDto: CreateTopicDto, userIds: number[]) {
+  //   const topic = this.topicRepository.create(createTopicDto);
+  //   const savedTopic = await this.topicRepository.save(topic);
+
+  //   if (userIds && userIds.length > 0) {
+  //     const users = await this.userService.findByIds(userIds);
+
+  //     for (const user of users) {
+  //       const userToTopic = new UserToTopic();
+  //       userToTopic.user = user;
+  //       userToTopic.topic = savedTopic;
+  //       await this.userToTopicRepository.save(userToTopic);
+  //     }
+  //   }
+
+  //   return savedTopic;
+  // }  
+
+  async create(createTopicDto: CreateTopicDto) {
+    const topic = this.topicRepository.create(createTopicDto);
+    return await this.topicRepository.save(topic);
   }
 
-  findAll() {
-    return `This action returns all topics`;
+  async findAll() {
+    return await this.topicRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} topic`;
+  async findOne(id) {
+    return await this.topicRepository.findOne(id);
   }
 
-  update(id: number, updateTopicDto: UpdateTopicDto) {
-    return `This action updates a #${id} topic`;
+  async update(id, updateTopicDto: UpdateTopicDto) {
+    await this.topicRepository.update(id, updateTopicDto);
+    return await this.topicRepository.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} topic`;
+  async remove(id: number) {
+    await this.topicRepository.delete(id);
+    return { deleted: true };
   }
 }

@@ -30,11 +30,9 @@
     "@nestjs/platform-socket.io": "^10.1.3",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.1.3",
+    "@socket.io/admin-ui": "^0.5.1",
     "bcrypt": "^5.1.1",
-<<<<<<< HEAD
-=======
     "bcryptjs": "^2.4.3",
->>>>>>> d0da95bb2c94baee04367ff2626d24b5388e71ef
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "mysql2": "^3.6.0",

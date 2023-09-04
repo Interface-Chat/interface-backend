@@ -6,18 +6,9 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { IsNotEmpty, IsString } from 'class-validator';
 import { Socket, Server } from 'socket.io';
-import { WebsocketsExceptionFilter } from './ws-exception.filter';
-
-class ChatMessage {
-  @IsNotEmpty()
-  @IsString()
-  nickname: string;
-  @IsNotEmpty()
-  @IsString()
-  message: string;
-}
+import { WebsocketsExceptionFilter } from '../ws-exception.filter';
+import { TopicContent } from 'src/modules/topic_contents/entities/topic_content.entity';
 
 @WebSocketGateway({
   cors: {
@@ -29,19 +20,51 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  @SubscribeMessage('text-chat')
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(`User connected: ${client.id}`);
+  }
+
+  @SubscribeMessage('message')
   @UsePipes(new ValidationPipe())
   handleMessage(
-    @MessageBody() message: ChatMessage,
+    @MessageBody() message: TopicContent,
     @ConnectedSocket() _client: Socket,
   ) {
-    this.server.emit('text-chat', {
+
+    
+    
+    this.server.emit('messageToAll', {
       ...message,
-      time: new Date().toDateString(),
+      time: new Date(),
     });
+
+    _client.broadcast.emit('messageExceptSender', {
+      ...message,
+      time: new Date(),
+    })
+    
+    // let room = message.topic_id;
+    // _client.broadcast.to(room).emit('messageExceptSender', {
+    //   ...message,
+    //   time: new Date(),
+    // })
   }
+
+
 }
 
+// import { IsNotEmpty, IsString } from 'class-validator';
+// class ChatMessage {
+//   @IsNotEmpty()
+//   @IsString()
+//   userID: string;
+//   @IsNotEmpty()
+//   @IsString()
+//   topicID: string;
+//   @IsNotEmpty()
+//   @IsString()
+//   message: string;
+// }
 
 
 
