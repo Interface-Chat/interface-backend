@@ -9,7 +9,7 @@ export class TopicContent {
   @ManyToOne(() => Topic, (topic) => topic.id)
   topic: Topic;
 
-  @ManyToOne(() => Topic, (topic) => topic.users)
+  @ManyToOne(() => Topic, (topic) => topic.userToTopics)
   user: Topic;
 
   @Column({ nullable: true })
