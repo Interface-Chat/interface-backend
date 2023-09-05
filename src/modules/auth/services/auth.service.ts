@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserLoginDto } from '../dtos/user_login.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { User } from 'src/modules/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { PassWord } from '../dtos/password_reset.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 
 @Injectable()
@@ -26,46 +27,38 @@ export class AuthService {
     }
 
     //validateUser
-    async validateUser(userLoginDto: UserLoginDto): Promise<User> {
-        const { email, password } = userLoginDto;
+    // async validateUser(userLoginDto: UserLoginDto): Promise<User> {
+    //     const { email, password } = userLoginDto;
 
-        const user = await this.usersService.findUserByEmail(email);
-        // if(user && await user.validatePassword){
-        //     return user;
-        // }
+    //     const user = await this.usersService.findUserByEmail(email);
+    //     if (!(await user.validatePassword(password))) {
+    //         throw new UnauthorizedException();
+    //     }
+    //     return user ;
+
+    // }
+
+    async validateUser(userLoginDto: UserLoginDto): Promise<User> {
+        const { username, password } = userLoginDto;
+
+        const user = await this.usersService.findUserByUsername(username);
         if (!(await user.validatePassword(password))) {
             throw new UnauthorizedException();
         }
         return user ;
     }
-    
 
-    // verifyToken(token: string): any {
-    //     try {
-    //       const decoded = this.jwtService.verify(token);
-    //       return decoded;
-    //     } catch (error) {
-    //       throw new Error('Token verification failed');
-    //     }
-    //   }
+    // user
+    // @UseGuards(JwtAuthGuard)
+    // async test(@Req() req: Request){
+    //     return req.user;
+    // }
 
+    //change password
+    async changePassword(resetPassword:PassWord)
+    {
 
-    //reset password
-
-    async resetPassword(
-        resetPassword:PassWord,
-        ){
-        // const resetPW = await this.login.apply(UserLoginDto)
-        
-        
-        const {username , password } = resetPassword
-        const auser = await this.usersService.findOneUser(username);
-
-        // async verifyToken(token: string): Promise<boolean> {
-        //     return this.resetTokensService.verifyToken(token);
-        //   }
-         
-        
     }
+    
 
 }

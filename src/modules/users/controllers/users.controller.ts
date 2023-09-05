@@ -22,7 +22,7 @@ export class UsersController {
     const user = await this.usersService.findUsers();
     return user;
   }
-  @Get('search/user')
+  @Get('search/:user')
   async getOneUser(@Param('username')username:string,
   @Body()findUser:CreaetUserType,
   ){

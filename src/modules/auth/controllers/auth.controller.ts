@@ -1,9 +1,9 @@
 import { Controller,Post,Body,Patch, Param, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { UserLoginDto } from '../dtos/user_login.dto';
-import { UpdateUserType } from 'src/utils/update_type';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import {Request} from 'express'
+// import { PassWord } from '../dtos/password_reset.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,20 +16,23 @@ export class AuthController {
         return this.authService.login(authloginDto);
     }
 
-    // Stay in login 
-    @Patch(':username/resetpassword')
-    async resetpassword(
-        @Param('username')username:string,
-        @Body() resetPassword:UpdateUserType,
-    ){
-        await this.authService.resetPassword(resetPassword)
-    }
+    // Stay in login to change password
+    // @UseGuards(JwtAuthGuard)
+    // @Patch(':user_id/resetpassword')
+    // async resetpassword(
+    //     @Param('user_id')user_id:number,
+    //     @Header('token')token:string,
+    //     @Body() resetPassword:PassWord,
+    // ){
+    //     await this.authService.test(token);
+    //     await this.authService.resetPassword
+    // }
+
+
     @UseGuards(JwtAuthGuard)
-    @Get('/me')
+    @Get('me')
     async test(@Req() req: Request){
         return req.user;
     }
-
-    
 
 }
