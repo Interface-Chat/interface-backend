@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { CreaetUserType } from 'src/utils/types';
+import { CreaetUserType, UserByIdType } from 'src/utils/types';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserType } from 'src/utils/update_type';
 
@@ -16,7 +16,7 @@ export class UsersService {
     return this.usersRepositiry.find();
   }
   //Create User 
-  async createUser(createUserType:CreaetUserType): Promise<User>{
+  async createUser(createUserType:CreateUserDto): Promise<User>{
     const user = await this.usersRepositiry.create({
       ...createUserType,
       CreateAT : new Date(),
@@ -56,51 +56,34 @@ async findOneUser(username:string){
   return findAUser;
 }
   
-  //Reset password by patch password 
+// Get user by  user_ID
+async findUserByID(user_id:number, userdetailById:UserByIdType){
+  const findAUserById = await User.findOne({
+    where:{
+      id : user_id,
+    }
+  });
+  return findAUserById;
+}
+
+
   
-  //
+//update userinfo 
   async updateUsersInfo(username:string ,updateUserInfo: UpdateUserType){
   await this.findOneUser(username);
   return this.usersRepositiry.update({username},{...updateUserInfo});
   }
 
-  // delete a user 
+// delete a user 
   deleteUser(username:string){
     return this.usersRepositiry.delete({username});
 }
 
+
+//compare password
+
   //create muliple users 
 async createMultipleUsers(): Promise<void>{}
-  // async createMultipleUsers(usersData: User[]): Promise<User[]> {
-  //   const createdUsers: User[] = [];
-  //   for (const userData of usersData) {
-  //     const createdUser = await this.createUser(userData);
-  //     createdUsers.push(createdUser);
-  //   }
-  //   return createdUsers;
-  // }
-
-  
 
 
-  
-
-
-
-
-  // findAll() {
-  //   return `This action returns all users`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} user`;
-  // }
-
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
 }

@@ -5,12 +5,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Entity({name: 'users'})
 export class User extends BaseEntity{
-  // static findOne(arg0: { where: { email: string; }; }) {
-  //   throw new Error('Method not implemented.');
-  // }
-  // save() {
-  //   throw new Error('Method not implemented.');
-  // }
+
   @PrimaryGeneratedColumn()
   id: number;
 
