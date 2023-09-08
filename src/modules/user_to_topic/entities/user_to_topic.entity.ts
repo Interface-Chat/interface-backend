@@ -7,7 +7,7 @@ export class UserToTopic {
     @PrimaryGeneratedColumn()
   id: number;
   
-  @ManyToOne(() => User, (user) => user.userToTopics)
+  @ManyToOne(() => User, (user) => user.userToTopics, { onDelete: 'CASCADE' })
   user: User;
 
   @ManyToOne(() => Topic, (topic) => topic.userToTopics)

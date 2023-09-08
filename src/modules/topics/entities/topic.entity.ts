@@ -13,10 +13,10 @@ export class Topic {
   @Column({ nullable: true })
   topic_profile_img: string;
 
-  @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.topic)
+  @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.topic, { cascade: true })
   userToTopics: UserToTopic[];
 
-  @OneToMany(() => TopicContent, (topicContent) => topicContent.topic)
+  @OneToMany(() => TopicContent, (topicContent) => topicContent.topic, { cascade: true })
   contentToTopic: TopicContent[];
 
   @CreateDateColumn()

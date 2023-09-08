@@ -44,13 +44,13 @@ export class TopicsService {
     return await this.topicRepository.find();
   }
 
-  async findOne(id) {
-    return await this.topicRepository.findOne(id);
+  async findOne(id: number) {
+    return await this.topicRepository.findOne({where: {id: id}});
   }
 
-  async update(id, updateTopicDto: UpdateTopicDto) {
+  async update(id: number, updateTopicDto: UpdateTopicDto) {
     await this.topicRepository.update(id, updateTopicDto);
-    return await this.topicRepository.findOne(id);
+    return await this.topicRepository.findOne({where: {id: id}});
   }
 
   async remove(id: number) {
