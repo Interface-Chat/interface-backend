@@ -22,11 +22,18 @@ export class UsersController {
     const user = await this.usersService.findUsers();
     return user;
   }
-  @Get('search/:user')
+  @Get('search/:username')
   async getOneUser(@Param('username')username:string,
   @Body()findUser:CreaetUserType,
   ){
     return this.usersService.findOneUser(username);
+    
+  }
+  @Get('id')
+  async getUserbyID(@Param('id')id:string,
+  @Body()findUser:CreaetUserType,
+  ){
+    return this.usersService.findUserByID(id);
     
   }
 

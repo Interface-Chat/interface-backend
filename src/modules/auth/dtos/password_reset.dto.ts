@@ -1,9 +1,10 @@
 import { IsNotEmpty } from "class-validator";
 
-export class PassWord{
-    user_id:number;
-    new_password:string;
+export class ChangePassWord{
+   
     @IsNotEmpty()
     password:string;
+    @IsNotEmpty()
+    new_password:string;
 
 }

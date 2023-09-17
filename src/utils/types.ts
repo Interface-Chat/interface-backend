@@ -6,10 +6,16 @@ export type CreaetUserType={
     password:string;
 }
 export type UserByIdType={
-    id:number;
+    id:string;
     username:string;
     fullname:string;
     email:string;
     mobile:string;
     password:string;
+}
+export type ChangePassWordType = {
+    new_password:string;
+    
+    password:string;
+
 }

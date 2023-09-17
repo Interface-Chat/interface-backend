@@ -57,10 +57,19 @@ async findOneUser(username:string){
 }
   
 // Get user by  user_ID
-async findUserByID(user_id:number, userdetailById:UserByIdType){
+async findUserByID(user_id:string){
   const findAUserById = await User.findOne({
     where:{
       id : user_id,
+    }
+  });
+  return findAUserById;
+}
+//Get password 
+async findUserPassword(password:string){
+  const findAUserById = await User.findOne({
+    where:{
+      password:password,
     }
   });
   return findAUserById;
@@ -81,6 +90,7 @@ async findUserByID(user_id:number, userdetailById:UserByIdType){
 
 
 //compare password
+
 
   //create muliple users 
 async createMultipleUsers(): Promise<void>{}
