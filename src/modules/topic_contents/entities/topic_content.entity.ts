@@ -9,8 +9,8 @@ export class TopicContent {
     @PrimaryGeneratedColumn()
   id: number;
 
-  // @ManyToOne(() => Topic, (topic) => topic.contentToTopic)
-  // topic: Topic;
+  @ManyToOne(() => Topic, (topic) => topic.contentToTopic)
+  topic: Topic;
 
   // @ManyToOne(() => UserToTopic, (userToTopic) => userToTopic.user)
   // user: UserToTopic;
@@ -18,8 +18,8 @@ export class TopicContent {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Topic)
-  topic: Topic;
+  // @ManyToOne(() => Topic)
+  // topic: Topic;
 
   @Column({ nullable: true })
   message: string;
