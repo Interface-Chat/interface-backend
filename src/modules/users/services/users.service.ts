@@ -46,6 +46,10 @@ export class UsersService {
     })
   }
 
+  async findOne(id: number) {
+    return await this.usersRepositiry.findOne({where: {id: id}});
+  }
+
 //find a user name and return date 
 async findOneUser(username:string){
   const findAUser = await User.findOne({

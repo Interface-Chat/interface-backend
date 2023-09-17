@@ -15,7 +15,9 @@ import { TagTopicModule } from './modules/tag_topic/tag_topic.module';
 import { ChatService } from './modules/chat/services/chat.service';
 import { UserToTopicModule } from './modules/user_to_topic/user_to_topic.module';
 import { AuthModule } from './modules/auth/auth.module';
+
 import { ConfigModule } from '@nestjs/config';
+import { TopicContentsService } from './modules/topic_contents/services/topic_contents.service';
 
 
 
@@ -26,11 +28,11 @@ import { ConfigModule } from '@nestjs/config';
     isGlobal: true
   })
   ,TypeOrmModule.forRoot(databaseConfig), // Connect to the database
-  ChatModule, UsersModule, RolesModule, 
+  ChatModule, UsersModule, RolesModule,
   RolePermissionModule, PermissionsModule, 
   TopicsModule, TopicContentsModule, UserTagModule, TagsModule, 
   TagTopicModule, UserToTopicModule, AuthModule],
   controllers: [],
-  providers: [ChatService],
+  providers: [],
 })
 export class AppModule {}

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, BeforeInsert, BaseEntity } from 'typeorm';
+import { UserToTopic } from 'src/modules/user_to_topic/entities/user_to_topic.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BaseEntity } from 'typeorm';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import * as bcrypt from 'bcryptjs';
 
@@ -26,6 +27,9 @@ export class User extends BaseEntity{
   @ManyToOne(() => Role, (role) => role.id)
   role: Role;
 
+  @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.user)
+  userToTopics: UserToTopic[];
+
   @Column({ nullable: true })
   fullName: string;
 
@@ -41,6 +45,7 @@ export class User extends BaseEntity{
   async validatePassword(password: string): Promise<boolean> {
       return bcrypt.compare(password, this.password);
   }
+
   
   
 }

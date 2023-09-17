@@ -1,26 +1,36 @@
+// user_to_topic.service.ts
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserToTopic } from '../entities/user_to_topic.entity';
 import { CreateUserToTopicDto } from '../dto/create-user_to_topic.dto';
-import { UpdateUserToTopicDto } from '../dto/update-user_to_topic.dto';
 
 @Injectable()
 export class UserToTopicService {
-  create(createUserToTopicDto: CreateUserToTopicDto) {
-    return 'This action adds a new userToTopic';
+  constructor(
+    @InjectRepository(UserToTopic)
+    private userToTopicRepository: Repository<UserToTopic>,
+  ) {}
+
+  async create(createUserToTopicDto: CreateUserToTopicDto): Promise<UserToTopic> {
+    const userToTopic = new UserToTopic();
+    // Map the properties from createUserToTopicDto to userToTopic
+    userToTopic.user = createUserToTopicDto.user;
+    userToTopic.topic = createUserToTopicDto.topic;
+
+    return this.userToTopicRepository.save(userToTopic);
   }
 
-  findAll() {
-    return `This action returns all userToTopic`;
+  async remove(id: number) {
+    await this.userToTopicRepository.delete(id);
+    return { deleted: true };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userToTopic`;
+  async findAll() {
+    return await this.userToTopicRepository.find();
   }
 
-  update(id: number, updateUserToTopicDto: UpdateUserToTopicDto) {
-    return `This action updates a #${id} userToTopic`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userToTopic`;
+  async findOne(id: number): Promise<UserToTopic | undefined> {
+    return this.userToTopicRepository.findOne({where: {id: id}});
   }
 }

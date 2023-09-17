@@ -1,6 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-// import { User} from '../typeorm/entities/User';
-import { User} from '../modules/users/entities/user.entity';
 import { join } from 'path';
 
 
