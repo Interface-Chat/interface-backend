@@ -1,1 +1,18 @@
-export class Tag {}
+import { UserTag } from "src/modules/user_tag/entities/user_tag.entity";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity({name:'tag'})
+export class Tag {
+    
+    @PrimaryGeneratedColumn()
+    id:number;
+
+    @Column({unique:true})
+    name:string;
+
+    @OneToMany(() => UserTag, (userToTag) => userToTag.tag)
+    userToTag: UserTag[];
+   
+
+   
+}

@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Role } from 'src/modules/roles/entities/role.entity';
-import { Permission } from 'src/modules/permissions/entities/permission.entity';
+import { Permission } from 'src/modules/users/entities/permission.entity';
 
 @Entity({ name: 'role-permission' })
 export class RolePermission {
@@ -8,7 +8,8 @@ export class RolePermission {
     id: number;
 
     @ManyToOne(() => Role, (role) => role.id)
-  role: Role;
+    role: Role;
+    
 
   @ManyToOne(() => Permission, (permission) => permission.id)
   permission: Permission;

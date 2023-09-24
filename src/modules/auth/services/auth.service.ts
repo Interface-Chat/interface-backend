@@ -1,4 +1,4 @@
-import { Injectable, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Injectable, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserLoginDto } from '../dtos/user_login.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -15,27 +15,27 @@ export class AuthService {
         private jwtService:JwtService
     ) { }
 
-    // async login(user:any) {
-    //     // const user = await this.validateUser(authLoginDto);
+    async login(user:any) {
+        // const user = await this.validateUser(authLoginDto);
 
-    //     const payload = { userId: user.id};
+        const payload = user;
 
-    //     return {
-    //         access_token: this.jwtService.sign(payload),
-    //     };
-    // }
-    //***This return user ID  */
-    async login(authLoginDto: UserLoginDto) {
-        const user = await this.validateUser(authLoginDto);
-
-        const payload = { userId: user.id};
-
-        // let getToken = localStorage.getItem("token");
         return {
             access_token: this.jwtService.sign(payload),
         };
-
     }
+    //***This return user ID  */
+    // async login(authLoginDto: UserLoginDto) {
+    //     const user = await this.validateUser(authLoginDto);
+
+    //     const payload = { 
+            
+    //     };
+    //     return {
+    //         access_token: this.jwtService.sign(payload),
+    //     };
+
+    // }
     
     
 
@@ -56,36 +56,36 @@ export class AuthService {
 
         const user = await this.usersService.findUserByUsername(username);
         if (!(await user.validatePassword(password))) {
-            throw new UnauthorizedException();
+            throw new BadRequestException('password is invalided ');
         }
         return user ;
     }
-
-    //Get user Profile
-    // @UseGuards(JwtAuthGuard)
     async getProfile(userByIdType:UserByIdType){
         const getuser = await this.usersService.findUserByID(userByIdType.id);
         return getuser;
     }
     
-
-    async changePassword(userId:string,changePassword:ChangePassWordType){
+    //update password 
+    async changePassword(username:string,changePassword:ChangePassWordType){
         const {new_password , password} =changePassword;
-        const user = await this.usersService.findUserByID(userId);
+        const user = await this.usersService.findUserByUsername(username);
+        const userPassword = await user.validatePassword(password); 
+        
+        if(!user){
+            return new UnauthorizedException('Username is invalid!');
+        }
+
         // const currentPassword =await this.usersService.findUserPassword(password);
-        if ((await user.validatePassword(password))){
+        if (userPassword){
+            // patch password 
             user.password = new_password;
             await user.save();
             
 
-        }else if (!(await user.validatePassword(password))) {
+        }else if (!userPassword) {
             throw new UnauthorizedException();
         }
-        // if (!(await user.validatePassword(password))) {
-        //     throw new UnauthorizedException();
-        // }
-        // user.password = new_password;
-        // return await user.save();
+        
         
       
     }

@@ -1,13 +1,15 @@
 import { UserToTopic } from 'src/modules/user_to_topic/entities/user_to_topic.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BaseEntity, JoinTable, ManyToMany, AfterUpdate, Timestamp, BeforeUpdate, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import * as bcrypt from 'bcryptjs';
+import { Exclude } from 'class-transformer';
+import { UserTag } from 'src/modules/user_tag/entities/user_tag.entity';
 
 @Entity({name: 'users'})
 export class User extends BaseEntity{
 
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ unique: true }) 
   username: string;
@@ -18,26 +20,33 @@ export class User extends BaseEntity{
   @Column({ nullable: true })
   mobile: string;
 
-  @Column()
+  // @Column({select: false})
+  @Column({})
+  @Exclude()
   password: string;
-
-  @Column()
-  CreateAT: Date;
-
-  @ManyToOne(() => Role, (role) => role.id)
-  role: Role;
-
-  @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.user)
-  userToTopics: UserToTopic[];
-
+  
   @Column({ nullable: true })
   fullName: string;
 
   @Column({ nullable: true })
   profile_img: string;
+  
 
+  @CreateDateColumn()
+  CreateAT: Date;
+  @UpdateDateColumn()
+  UpdateAT:Date;
 
+  @ManyToOne(() => Role, (role) => role.id,{cascade:true})
+  role: Role;
+
+  @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.user)
+  userToTopics: UserToTopic[];
+
+  @OneToMany(() => UserTag, (userToTag) => userToTag.user)
+  userToTag: UserTag[];
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword(): Promise<void> {
       this.password = await bcrypt.hash(this.password, 8);
   }

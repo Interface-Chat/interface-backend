@@ -1,12 +1,14 @@
+
 export type CreaetUserType={
     username:string;
     fullname:string;
     email:string;
     mobile:string;
     password:string;
+    // role:string[];
 }
 export type UserByIdType={
-    id:string;
+    id:number;
     username:string;
     fullname:string;
     email:string;
@@ -15,7 +17,22 @@ export type UserByIdType={
 }
 export type ChangePassWordType = {
     new_password:string;
-    
     password:string;
-
 }
+export type ReturnUserDetail = {
+    id:number;
+    username:string;
+    fullname:string;
+    email:string;
+    mobile:string;
+    password:string;
+    role:string; 
+}
+export type UpdateUserType={
+    username:string;
+    fullname:string;
+    email:string;
+    mobile:string;
+    // password:string;
+}
+

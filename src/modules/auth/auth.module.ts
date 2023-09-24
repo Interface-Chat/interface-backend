@@ -17,7 +17,7 @@ import { LocalStrategy } from './guards/local.strategy';
       imports: [ConfigModule],
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '600000s' },
+        signOptions: { expiresIn: '1000s' },
       }),
       inject: [ConfigService],
     }),

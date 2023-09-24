@@ -1,57 +1,97 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
+import { RoleService } from 'src/modules/roles/services/role.service';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { CreaetUserType } from 'src/utils/types';
-import { UpdateUserType } from 'src/utils/update_type';
+import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
+
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly roleService: RoleService,
+  ) {}
 
 
-   //create one user
-   @Post(`create`)
-   createUser(@Body() createUserDto:CreateUserDto): Promise<User> {
-     return this.usersService.createUser(createUserDto);
-   }
 
-//list many users 
+  // @Post('create')
+  // async createUser(
+  //   @Body()CreateUserDto:CreateUserDto,role:string
+  // )
+  // {
+  //   const createUser = await this.usersService.createUser(CreateUserDto,role)
+  //   return createUser;
+  // }
+  @Post(`create`)
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    const createuser = await this.usersService.createUser(createUserDto);
+    return createuser;
+  }
+
+  //update
+  @Patch('updateUser/:id')
+  async adminUpdateUser(
+    @Param('id')id:number,
+    @Body()adminUpdateUser:AdminUpdateUserDto){
+      await this.usersService.updateUserByAdmin(+id,adminUpdateUser);
+      return 'Updated';
+
+    }
+ 
+
+  //list many users
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('list')
-  async getUser(){
+  async getUser() {
     const user = await this.usersService.findUsers();
     return user;
   }
+
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('search/:username')
-  async getOneUser(@Param('username')username:string,
-  @Body()findUser:CreaetUserType,
-  ){
-    return this.usersService.findOneUser(username);
-    
+  async getOneUser(@Param('username') username: string) {
+    const getUser = this.usersService.findOneUser(username);
+    return getUser;
   }
-  @Get('id')
-  async getUserbyID(@Param('id')id:string,
-  @Body()findUser:CreaetUserType,
-  ){
-    return this.usersService.findUserByID(id);
-    
-  }
+  // @Get(':id')
+  // async getUserbyID(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() findUser: CreaetUserType,
+  // ) {
+  //   return this.usersService.findUserByID(id);
+  // }
 
-  //Update User Information 
+  //Update User Information
+  @UseGuards(JwtAuthGuard)
+  // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('updateinfo/:username')
-  async updateUserInfo(@Param('username')username:string,
-  @Body()updateInfo:UpdateUserType,
-  ) 
-  {
-   await this.usersService.updateUsersInfo(username , updateInfo); 
+  async updateUserInfo(
+    @Param('username') username: string,
+    @Body() updateInfo: UpdateUserDto,
+  ) {
+    await this.usersService.updateUsersInfo(username, updateInfo);
+    return 'updated';
   }
 
-
-//deletep a user
-@Delete('delete/:username')
-async deleteUser(@Param('username')username:string)
-{
- await this.usersService.deleteUser(username)
-}
-  
+  //deletep a user
+  @Delete('delete/:username')
+  async deleteUser(@Param('username') username: string) {
+    await this.usersService.deleteUser(username);
+  }
 }
