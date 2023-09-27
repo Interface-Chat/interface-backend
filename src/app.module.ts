@@ -18,9 +18,11 @@ import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express/multer';
 import { multerConfig } from './configs/multer.config';
 import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './modules/roles/roles.guard';
+import { RolesGuard } from './modules/auth/guards/roles.guard';
 // import { ChatService } from './modules/chat/services/chat.service';
 // import { TopicContentsService } from './modules/topic_contents/services/topic_contents.service';
+import { RolesController } from './modules/roles/controllers/roles.controller';
+import { UploadFileModule } from './modules/uploadfile/upload_file.module';
 
 
 
@@ -30,21 +32,23 @@ import { RolesGuard } from './modules/roles/roles.guard';
   imports: [ConfigModule.forRoot({
     isGlobal: true
   }),
+  ConfigModule.forRoot(),
   MulterModule.register(multerConfig),
   TypeOrmModule.forRoot(databaseConfig), // Connect to the database
   ChatModule, UsersModule,
   RolesModule,
   TagsModule,
   UserTagModule,
+  UploadFileModule,
   TopicsModule, TopicContentsModule, UserTagModule, TagsModule, 
   TagTopicModule, UserToTopicModule, AuthModule],
-  controllers: [],
+  controllers: [RolesController],
   providers: [
     // MulterModule,
-    {
-      provide:APP_GUARD,
-      useClass:RolesGuard
-    }
+    // {
+    //   provide:APP_GUARD,
+    //   useClass:RolesGuard
+    // }
   ],
 })
 export class AppModule {}

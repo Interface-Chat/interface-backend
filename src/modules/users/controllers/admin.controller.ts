@@ -19,14 +19,13 @@ import {
   import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
   import { CreaetUserType } from 'src/utils/types';
   import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
-import { RoleDto } from 'src/modules/roles/dtos/roles.dto';
+// import { RoleDto } from 'src/modules/roles/dtos/roles.dto';
   
   
   @Controller('admin')
   export class AdminController {
     constructor(
       private readonly usersService: UsersService,
-      private readonly roleService: RoleService,
     ) {}
   
     //CREATE
@@ -35,10 +34,7 @@ import { RoleDto } from 'src/modules/roles/dtos/roles.dto';
       const createuser = await this.usersService.createUser(createUserDto);
       return createuser;
     }
-    @Post('role')
-    async createRoleUser(@Body()role:RoleDto){
-        await this.roleService.createRole(role);
-    }
+    
   
     //update
     @Patch('updateUser/:id')
@@ -70,7 +66,7 @@ import { RoleDto } from 'src/modules/roles/dtos/roles.dto';
       @Param('id', ParseIntPipe) id: number,
       @Body() findUser: CreaetUserType,
     ) {
-      return this.usersService.findUserByID(id);
+      return this.usersService.findUserByID(+id);
     }
   
     //Update User Information

@@ -1,6 +1,6 @@
 export enum ERole {
     Admin = 'admin',
-    User = 'user',
     Teacher ='teacher',
-    Staff ='Staff',
+    Staff ='staff',
+    Student='student',
 }

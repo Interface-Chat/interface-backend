@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { ERole } from './role.enum';
+import { ERole } from '../../roles/role.enum';
 
 
 

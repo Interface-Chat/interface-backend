@@ -12,7 +12,10 @@ async function bootstrap() {
     credentials: true,
   });
   // app.setGlobalPrefix('api');
-  await app.listen(3001);
+  await app.listen(3001, ()=>{
+    console.log('App is running on port http://localhost:3001');
+    
+  });
   // await app.listen(3000);
 
 }

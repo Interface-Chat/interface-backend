@@ -11,62 +11,46 @@ import {
 import { Role } from '../../roles/entities/role.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
-
+import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepositiry: Repository<User>,
     @InjectRepository(Role) private roleRepositiry: Repository<Role>,
+    private imageService: UploadFileService,
   ) {}
 
   findUsers() {
     // const findRole = this.roleRepositiry.find();
-    const findUsers = this.usersRepositiry.find({relations :{role:true}});
+    const findUsers = this.usersRepositiry.find({ relations: { roles: true}});
     return findUsers;
   }
-  
 
   async createUser(createuserDto: CreateUserDto) {
     try {
       const user = new User();
-      user.role = await this.roleRepositiry.findOne({where: {id: createuserDto.role_id}})
-      user.username =createuserDto.username
+      user.roles = await this.roleRepositiry.findOne({
+        where: { id: createuserDto.role_id },
+      });
+      user.username = createuserDto.username;
       user.email = createuserDto.email;
       user.fullName = createuserDto.fullname;
       user.mobile = createuserDto.mobile;
-      user.password=createuserDto.password;
-      user.profile_img=createuserDto.profile_img;
-      // ({CreateAT : new Date()});
-      // ({user.CreateAT:new Date()})
-
-      
-     
-      await user.save();
+      user.password = createuserDto.password;
+      user.profile_img = createuserDto.profile_img;
     
+      await user.save();
+
       delete user.password;
       return user;
     } catch (e) {
       console.log(e);
-      
+
       throw new BadRequestException(e.message);
     }
   }
-  //Create User
-  // async createUser(createUserType:CreaetUserType): Promise<User>{
 
-  //   const user = await this.usersRepositiry.create({
-  //     ...createUserType,
-
-  //   });
-  //   await user.save();
-
-  //   delete user.password;
-  //   return user;
-  // }
-  
-
-  //find email
   async findUserByEmail(email: string) {
     return await User.findOne({
       where: {
@@ -81,14 +65,9 @@ export class UsersService {
       where: {
         username: username,
       },
-      relations:{role:true},
+      relations: { roles: true },
     });
   }
-  //patch password
-  // async updatePW(password:string){
-  //   await this.findUserPassword(password)
-  //   const update = await this.usersRepositiry.update(...password)
-  // }
 
   //find a user name and return date
   async findOneUser(username: string) {
@@ -96,7 +75,7 @@ export class UsersService {
       where: {
         username: username,
       },
-      relations: { role: true }
+      relations: { roles: true },
     });
     return findAUser;
   }
@@ -106,9 +85,8 @@ export class UsersService {
     const findAUserById = await User.findOne({
       where: {
         id: user_id,
-        // role:create.role_id,
       },
-      relations:{role:true}
+      relations: { roles: true },
     });
     return findAUserById;
   }
@@ -121,14 +99,37 @@ export class UsersService {
     });
     return finduserPassword;
   }
-  //update user by admin 
-  async updateUserByAdmin(id:number,adminUpdateUser:AdminUpdateUserDto){
-    await this.findUserByID(id)
-    return this.usersRepositiry.update(+id,adminUpdateUser)
-    // const user = new User();
-    
-  }
+  //update user by admin
+  async updateUserByAdmin(id: number, adminUpdateUser: AdminUpdateUserDto) {
+    try {
+      const user = await this.findUserByID(id);
+      user.email = adminUpdateUser.email;
+      user.fullName = adminUpdateUser.fullname;
+      user.username = adminUpdateUser.username;
+      user.password = adminUpdateUser.password;
+      user.roles = adminUpdateUser.role_id;
+      return this.usersRepositiry.save(user);
+    } catch (e) {
+      throw new BadRequestException('false');
+    }
 
+    // const user = new User();
+  }
+  //upload file
+  async uploadImage(id:number,img?: any) {
+    try {
+      await this.findUserByID(+id)
+      const Image = await this.imageService.saveImage(
+        img,
+        './src/assets/profile',
+      );
+      const user = new User();
+      user.profile_img = Image;
+      return this.usersRepositiry.save(user);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
   //update userinfo
 
   async updateUsersInfo(username: string, updateUserInfo: UpdateUserType) {
@@ -141,9 +142,4 @@ export class UsersService {
   deleteUser(username: string) {
     return this.usersRepositiry.delete({ username });
   }
-
-  //compare password
-
-  //create muliple users
-//   async createMultipleUsers(): Promise<void> {}
 }

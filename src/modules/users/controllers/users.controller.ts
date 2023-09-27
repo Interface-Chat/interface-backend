@@ -19,16 +19,25 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { CreaetUserType } from 'src/utils/types';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
+import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
 
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly roleService: RoleService,
+        // private readonly roleService: RoleService,
   ) {}
 
 
+  @Patch('profile/upload/:id')
+  async uploadProfile(
+  @Param('id')id:number,
+    @Body()img:any)
+  {
+    return await this.usersService.uploadImage(+id,img)
+    
+  }
 
   // @Post('create')
   // async createUser(
@@ -69,13 +78,17 @@ export class UsersController {
     const getUser = this.usersService.findOneUser(username);
     return getUser;
   }
-  // @Get(':id')
-  // async getUserbyID(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() findUser: CreaetUserType,
-  // ) {
-  //   return this.usersService.findUserByID(id);
-  // }
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id')
+  async getUserbyID(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() findUser: CreaetUserType,
+  ) {
+    return this.usersService.findUserByID(+id);
+  }
+
+  //Select Admin
+  
 
   //Update User Information
   @UseGuards(JwtAuthGuard)

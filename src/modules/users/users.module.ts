@@ -6,9 +6,11 @@ import { User } from './entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 import { RolesModule } from '../roles/roles.module';
 import { AdminController } from './controllers/admin.controller';
+import { UploadFileModule } from '../uploadfile/upload_file.module';
 
 @Module({
   imports:[
+    UploadFileModule,
     RolesModule,
     TypeOrmModule.forFeature(
       [User,Role]
