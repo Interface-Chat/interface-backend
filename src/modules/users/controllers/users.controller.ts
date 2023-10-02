@@ -10,6 +10,7 @@ import {
   ClassSerializerInterceptor,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { CreaetUserType } from 'src/utils/types';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
 import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 
 
 @Controller('users')
@@ -29,6 +31,21 @@ export class UsersController {
         // private readonly roleService: RoleService,
   ) {}
 
+  @Post('createmany')
+  async createManyUser(createManyUserDto:CreateUserDto[]):Promise<User[]>{
+    console.log(createManyUserDto);
+    
+    return this.usersService.createMultipleUser(createManyUserDto);
+
+  }
+  
+  //get search and sort
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get()
+  async findall(@Paginate() query: PaginateQuery):Promise<Paginated<User>>{
+    return this.usersService.search(query);
+
+  }
 
   @Patch('profile/upload/:id')
   async uploadProfile(
@@ -60,7 +77,6 @@ export class UsersController {
     @Body()adminUpdateUser:AdminUpdateUserDto){
       await this.usersService.updateUserByAdmin(+id,adminUpdateUser);
       return 'Updated';
-
     }
  
 
@@ -95,16 +111,22 @@ export class UsersController {
   // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('updateinfo/:username')
   async updateUserInfo(
-    @Param('username') username: string,
+    @Param('id') id: number,
     @Body() updateInfo: UpdateUserDto,
+    @Request() req
   ) {
-    await this.usersService.updateUsersInfo(username, updateInfo);
+    await this.usersService.updateUsersInfo(req.user.id, updateInfo);
     return 'updated';
   }
+
 
   //deletep a user
   @Delete('delete/:username')
   async deleteUser(@Param('username') username: string) {
-    await this.usersService.deleteUser(username);
+    await this.usersService.deleteUserByusername(username);
   }
+  
+  
+
+  
 }

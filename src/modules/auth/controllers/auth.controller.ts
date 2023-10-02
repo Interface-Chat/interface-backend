@@ -20,18 +20,27 @@ import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { ChangePassWord } from '../dtos/password_reset.dto';
 import { UpdateAuth } from '../dtos/updateAuth.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
-import { multerConfig } from 'src/configs/multer.config';
 import { Roles } from 'src/modules/common/decorators/roles.decorator';
 import { ERole } from 'src/modules/roles/role.enum';
 import { RolesGuard } from '../guards/roles.guard';
+// import { isFileExtensionSafe, removeFile, saveImageToStorage } from 'src/helpers/image_storage';
+import { Observable, map, of, switchMap } from 'rxjs';
+import { join } from 'path';
+import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private imageService: UploadFileService
+
   ) {}
-  // @UseGuards(LocalAuthGuard)
+
+    //Login
+  @UseGuards(LocalAuthGuard)
+  // @Roles(ERole.Teacher,ERole.Student)
+  // @UseGuards(RolesGuard)
   @Post('login')
   async login(@Body() authloginDto: UserLoginDto) {
     // console.log(authloginDto);
@@ -39,35 +48,31 @@ export class AuthController {
     return this.authService.login(authloginDto);
   }
 
-  //or use this method
-  //   @UseGuards(LocalAuthGuard)
-  //   ///auth/signin
-  //   @Post('login')
-  //   async login(@Request() req) {
-  //     return this.authService.login(req.user);
-  //     }
+  //Get profile
   @UseGuards(JwtAuthGuard)
-  @Roles(ERole.Teacher)
+  @Roles(ERole.Teacher,ERole.Student)
   @UseGuards(RolesGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('profile')
   async getProfile(@Request() req) {
-    // const user = await this.authService.getProfile(req.user);
     return req.user;
   }
 
-  //update user
-  @Patch('update/:username')
+  //update user this => call from authservice <= from userservice
+  @Patch('update/:id')
   @UseGuards(JwtAuthGuard)
   async updateProfile(
-    @Param('username') username: string,
+    @Param('id') id: number,
     @Body() updateProfileAuth: UpdateAuth,
   ) {
-    await this.userService.updateUsersInfo(username, updateProfileAuth);
+    await this.authService.updateAuthInfo(id, updateProfileAuth);
     return 'updated';
   }
+
+
   //change password
   @UseGuards(JwtAuthGuard)
+  @Roles(ERole.Teacher,ERole.Student,ERole.Staff)
   @Patch('change_password/:id')
   async changePassword(
     @Param('id') id: number,
@@ -77,20 +82,56 @@ export class AuthController {
     await this.authService.changePassword(+id, changePasswordDto);
     return 'changed';
   }
+  ///upload image 
+  // @UseGuards(JwtAuthGuard)
+  // @Patch('Update_profile:id')
+  // @UseInterceptors(FileInterceptor('image', multerConfig))
+  // async uploadFile(
+  //   @UploadedFile() image: Express.Multer.File,
+  //   @Param('id') id: number,
+  // ) {
+
+  //   return { message: 'File uploaded and saved to the database successfully' };
+  // }
+  //uplaod image 
   @UseGuards(JwtAuthGuard)
-  @Patch('Update_profile:id')
-  @UseInterceptors(FileInterceptor('image', multerConfig))
-  async uploadFile(
-    @UploadedFile() image: Express.Multer.File,
-    @Param('id') id: number,
-  ) {
-    // const newImage = new Image();
-    // this.userService.updateProfile_img(id);
-
-    //      await this..save(newImage);
-
-    return { message: 'File uploaded and saved to the database successfully' };
+  @Patch('upload/profile')
+  async uploadImage(image:any){
+    console.log(image);
+    return await this.authService.uploadImage(image);
   }
+
+  // file image 
+  // @UseGuards(JwtAuthGuard)
+  // @Post('upload')
+  // @UseInterceptors(FileInterceptor('file', saveImageToStorage))
+  // uploadImage(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Request() req,
+  // ): Observable<{ modifiedFileName: string } | { error: string }> {
+  //   const fileName = file?.filename;
+
+  //   if (!fileName) return of({ error: 'File must be a png, jpg/jpeg' });
+
+  //   const imagesFolderPath = join(process.cwd(), 'images');
+  //   const fullImagePath = join(imagesFolderPath + '/' + file.filename);
+
+  //   return isFileExtensionSafe(fullImagePath).pipe(
+  //     switchMap((isFileLegit: boolean) => {
+  //       if (isFileLegit) {
+  //         const userId = req.user.id;
+  //         return this.userService.updateUserImageById(userId, fileName).pipe(
+  //           map(() => ({
+  //             modifiedFileName: file.filename,
+  //           })),
+  //         );
+  //       }
+  //       removeFile(fullImagePath);
+  //       return of({ error: 'File content does not match extension!' });
+  //     }),
+  //   );
+  }
+  
 
   // @UseGuards(JwtAuthGuard)
   // @Get('me')
@@ -98,4 +139,13 @@ export class AuthController {
   //     // const user = await this.authService.getProfile({req.user})
   //     return req.user;
   // }
-}
+  //or use this method
+  //   @UseGuards(LocalAuthGuard)
+  //   ///auth/signin
+  //   @Post('login')
+  //   async login(@Request() req) {
+  //     return this.authService.login(req.user);
+  //     }
+
+
+// }

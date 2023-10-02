@@ -15,10 +15,7 @@ import { TagTopicModule } from './modules/tag_topic/tag_topic.module';
 import { UserToTopicModule } from './modules/user_to_topic/user_to_topic.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { MulterModule } from '@nestjs/platform-express/multer';
-import { multerConfig } from './configs/multer.config';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './modules/auth/guards/roles.guard';
+
 // import { ChatService } from './modules/chat/services/chat.service';
 // import { TopicContentsService } from './modules/topic_contents/services/topic_contents.service';
 import { RolesController } from './modules/roles/controllers/roles.controller';
@@ -33,7 +30,7 @@ import { UploadFileModule } from './modules/uploadfile/upload_file.module';
     isGlobal: true
   }),
   ConfigModule.forRoot(),
-  MulterModule.register(multerConfig),
+  // MulterModule.register(multerConfig),
   TypeOrmModule.forRoot(databaseConfig), // Connect to the database
   ChatModule, UsersModule,
   RolesModule,

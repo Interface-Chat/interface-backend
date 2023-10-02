@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BeforeInsert, Repository } from 'typeorm';
+import { BeforeInsert, Repository, UpdateResult } from 'typeorm';
 import { User } from '../entities/user.entity';
 import {
   CreaetUserType,
@@ -12,6 +12,8 @@ import { Role } from '../../roles/entities/role.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
 import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
+import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
+import { Observable, from } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -22,8 +24,7 @@ export class UsersService {
   ) {}
 
   findUsers() {
-    // const findRole = this.roleRepositiry.find();
-    const findUsers = this.usersRepositiry.find({ relations: { roles: true}});
+    const findUsers = this.usersRepositiry.find({ relations: { roles: true, userToTag:true}});
     return findUsers;
   }
 
@@ -130,16 +131,68 @@ export class UsersService {
       throw new BadRequestException();
     }
   }
+
+
   //update userinfo
+  async updateUsersInfo(id:number, updateUserInfo: UpdateUserType) {
+    // await this.findOneUser(username);
+    await this.findUserByID(+id)
 
-  async updateUsersInfo(username: string, updateUserInfo: UpdateUserType) {
-    await this.findOneUser(username);
+    return this.usersRepositiry.update({ id }, { ...updateUserInfo });
+  }
 
-    return this.usersRepositiry.update({ username }, { ...updateUserInfo });
+
+  //search user
+  async search(query:PaginateQuery):Promise<Paginated<User>>{
+    return paginate(query,this.usersRepositiry,{
+      sortableColumns:['username','roles','fullName','mobile'],
+      searchableColumns:['username','roles','fullName','mobile'],
+      relations:{roles:true}
+      // searchableColumns:['username',]
+      
+    })
+
   }
 
   // delete a user
-  deleteUser(username: string) {
-    return this.usersRepositiry.delete({ username });
+  deleteUserById(id:number){
+    return this.usersRepositiry.delete(id);
   }
+  deleteUserByusername(username:string){
+    return this.usersRepositiry.delete(username)
+  }
+
+  //Create multiple User in a time 
+  async createMultipleUser(users:CreateUserDto[]):Promise<User[]>{
+    const createUsers:User[] =[];
+    for(const userData of users){
+      const user = this.usersRepositiry.create(userData);
+      const createdUser = await this.usersRepositiry.save(user);
+      createUsers.push(createdUser);
+
+    }
+    return createUsers;
+
+  }
+
+  //upload image 
+  updateUserImageById(id: number, imagePath: string): Observable<UpdateResult> {
+    const user= new User();
+    user.id = id;
+    user.profile_img = imagePath;
+    return from(this.usersRepositiry.update(id, user));
+  }
+
+  // deleteUser(id:number,username: string) {
+  //   const user:any = {id,username}
+  //   if(user.id==id){
+  //   return this.usersRepositiry.delete({ ...user.id });
+  //   }else if(user.username==username){
+  //     return this.usersRepositiry.delete({ ...user.username});
+  //   }
+  //   else{
+  //     return'You are not this User. So you cannot delete this user!!!'
+  //   }
+    // return this.usersRepositiry.delete({ username });
+  // }
 }

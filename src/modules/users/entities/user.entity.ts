@@ -20,7 +20,9 @@ export class User extends BaseEntity{
   @Column({ nullable: true })
   mobile: string;
 
-  // @Column({select: false})
+  @Column({ type: 'date' }) // This defines a "date of birth" field
+  dateOfBirth: Date;
+ 
   @Column({})
   @Exclude()
   password: string;
@@ -45,11 +47,17 @@ export class User extends BaseEntity{
 
   @OneToMany(() => UserTag, (userToTag) => userToTag.user)
   userToTag: UserTag[];
+
+
+
+  //before Insert and before update  
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
       this.password = await bcrypt.hash(this.password, 8);
   }
+
+  
 
   async validatePassword(password: string): Promise<boolean> {
       return bcrypt.compare(password, this.password);

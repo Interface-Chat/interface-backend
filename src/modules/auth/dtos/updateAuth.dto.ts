@@ -5,6 +5,7 @@ export class UpdateAuth{
     fullname:string;
     email:string;
     mobile:string;
+    dob:Date;
     // password:string;
     role:ERole[];
 }

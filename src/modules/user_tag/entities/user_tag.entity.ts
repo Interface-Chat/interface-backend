@@ -7,10 +7,10 @@ export class UserTag {
     @PrimaryGeneratedColumn()
     id:number;
 
-    @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, (user) => user.userToTag)
     user: User;
 
-    @ManyToOne(()=>Tag,(tag)=>tag.userToTag , {onDelete:'CASCADE'})
+    @ManyToOne(()=>Tag,(tag)=>tag.userToTag)
     tag:Tag;
 
     

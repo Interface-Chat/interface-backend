@@ -1,5 +1,8 @@
+import { Tag } from "src/modules/tags/entities/tag.entity";
+import { User } from "src/modules/users/entities/user.entity";
+
 export class CreateUserTagDto {
-    user_id:any;
-    tag_id:any;
+    userid:any;
+    tagid:any;
 }
 

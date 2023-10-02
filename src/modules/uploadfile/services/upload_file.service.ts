@@ -2,7 +2,6 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { extname, parse } from 'path';
-
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 
 
@@ -40,9 +39,8 @@ export class UploadFileService {
       console.error(err)
     }
   }
-
   // replace file
-  deleteAndAdd(oldFilePath: string, newFile: any, newPath: string) {
+  deleteAndAdd(oldFilePath: string, newFile: any, newPath?: string) {
     this.deleteFile(oldFilePath);
     return this.saveImage(newFile, newPath);
   }

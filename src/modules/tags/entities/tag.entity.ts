@@ -7,6 +7,7 @@ export class Tag {
     @PrimaryGeneratedColumn()
     id:number;
 
+    //name have only one
     @Column({unique:true})
     name:string;
 
