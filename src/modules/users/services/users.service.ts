@@ -24,7 +24,10 @@ export class UsersService {
   ) {}
 
   findUsers() {
-    const findUsers = this.usersRepositiry.find({ relations: { roles: true, userToTag:true}});
+    const findUsers = this.usersRepositiry.find({
+      relations: { roles: true, userToTag: { tag: true } },
+      select: { roles: { name: true } },
+    });
     return findUsers;
   }
 
@@ -40,7 +43,7 @@ export class UsersService {
       user.mobile = createuserDto.mobile;
       user.password = createuserDto.password;
       user.profile_img = createuserDto.profile_img;
-    
+
       await user.save();
 
       delete user.password;
@@ -88,6 +91,7 @@ export class UsersService {
         id: user_id,
       },
       relations: { roles: true },
+      select:{roles:{name:true}},
     });
     return findAUserById;
   }
@@ -117,9 +121,9 @@ export class UsersService {
     // const user = new User();
   }
   //upload file
-  async uploadImage(id:number,img?: any) {
+  async uploadImage(id: number, img?: any) {
     try {
-      await this.findUserByID(+id)
+      await this.findUserByID(+id);
       const Image = await this.imageService.saveImage(
         img,
         './src/assets/profile',
@@ -132,52 +136,46 @@ export class UsersService {
     }
   }
 
-
   //update userinfo
-  async updateUsersInfo(id:number, updateUserInfo: UpdateUserType) {
+  async updateUsersInfo(id: number, updateUserInfo: UpdateUserType) {
     // await this.findOneUser(username);
-    await this.findUserByID(+id)
+    await this.findUserByID(+id);
 
     return this.usersRepositiry.update({ id }, { ...updateUserInfo });
   }
 
-
   //search user
-  async search(query:PaginateQuery):Promise<Paginated<User>>{
-    return paginate(query,this.usersRepositiry,{
-      sortableColumns:['username','roles','fullName','mobile'],
-      searchableColumns:['username','roles','fullName','mobile'],
-      relations:{roles:true}
+  async search(query: PaginateQuery): Promise<Paginated<User>> {
+    return paginate(query, this.usersRepositiry, {
+      sortableColumns: ['username', 'roles', 'fullName', 'mobile'],
+      searchableColumns: ['username', 'roles', 'fullName', 'mobile'],
+      relations: { roles: true },
       // searchableColumns:['username',]
-      
-    })
-
+    });
   }
 
   // delete a user
-  deleteUserById(id:number){
+  deleteUserById(id: number) {
     return this.usersRepositiry.delete(id);
   }
-  deleteUserByusername(username:string){
-    return this.usersRepositiry.delete(username)
+  deleteUserByusername(username: string) {
+    return this.usersRepositiry.delete(username);
   }
 
-  //Create multiple User in a time 
-  async createMultipleUser(users:CreateUserDto[]):Promise<User[]>{
-    const createUsers:User[] =[];
-    for(const userData of users){
+  //Create multiple User in a time
+  async createMultipleUser(users: CreateUserDto[]): Promise<User[]> {
+    const createUsers: User[] = [];
+    for (const userData of users) {
       const user = this.usersRepositiry.create(userData);
       const createdUser = await this.usersRepositiry.save(user);
       createUsers.push(createdUser);
-
     }
     return createUsers;
-
   }
 
-  //upload image 
+  //upload image
   updateUserImageById(id: number, imagePath: string): Observable<UpdateResult> {
-    const user= new User();
+    const user = new User();
     user.id = id;
     user.profile_img = imagePath;
     return from(this.usersRepositiry.update(id, user));
@@ -193,6 +191,6 @@ export class UsersService {
   //   else{
   //     return'You are not this User. So you cannot delete this user!!!'
   //   }
-    // return this.usersRepositiry.delete({ username });
+  // return this.usersRepositiry.delete({ username });
   // }
 }
