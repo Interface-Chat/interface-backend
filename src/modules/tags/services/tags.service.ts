@@ -31,9 +31,9 @@ export class TagsService {
 
   //validate tag
   async validatetag(name:string){
-  return this.tagRepositiry.findOne({
-    where:{name:name}
-  })
+    return this.tagRepositiry.findOne({
+      where:{name:name}
+    })
 
   }
 }

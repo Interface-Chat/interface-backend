@@ -1,9 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Request,UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
 import { UserTagService } from '../services/user_tag.service';
 import { CreateUserTagDto } from '../dto/create-user_tag.dto';
-import { UserTag } from '../entities/user_tag.entity';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { log } from 'console';
 import { Roles } from 'src/modules/common/decorators/roles.decorator';
 import { ERole } from 'src/modules/roles/role.enum';
 // import { UpdateUserTagDto } from '../dto/update-user_tag.dto';
@@ -64,4 +62,14 @@ export class UserTagController {
     console.log(name);
     return await this.userTagService.selectBytag(name);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(ERole.Teacher)
+  async roleSeleteUserBytag(@Request()req){
+    return await this.userTagService.roleSelectBytag(req.user_tag.name)
+
+  }
+
+
+  
 }

@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserTagDto } from '../dto/create-user_tag.dto';
 import { UpdateUserTagDto } from '../dto/update-user_tag.dto';
 import { use } from 'passport';
+import { TagsService } from 'src/modules/tags/services/tags.service';
 
 @Injectable()
 export class UserTagService {
@@ -14,6 +15,8 @@ export class UserTagService {
     @InjectRepository(User) private userRepositiry: Repository<User>,
     @InjectRepository(UserTag) private usertagRepositiry: Repository<UserTag>,
     @InjectRepository(Tag) private tagRepositiry: Repository<Tag>,
+    private tagService:TagsService,
+
   ) {}
 
   async createUserTag(userTagDto: CreateUserTagDto) {
@@ -80,13 +83,34 @@ export class UserTagService {
     })
   }
   // select a tag relate to user id tag true get many user
-async selectBytag(name:string){
-  return await this.usertagRepositiry.find({
-    where:{tag:{name:name}},
-    relations:{user:true},
-    select:{user:{username:true,id:true}}
-  })
-}
+  async selectBytag(name:string){
+    return await this.usertagRepositiry.find({
+      where:{tag:{name:name}},
+      relations:{user:true},
+      select:{user:{username:true,id:true}}
+    })
+  }
+
+
+  //for role select 
+  async roleSelectBytag(name:string){
+    const check = await this.tagService.validatetag(name);
+    try{
+      if(!check) return false;
+      return await this.usertagRepositiry.find({
+        where:{tag:{name:name}},
+        relations:{user:true},
+        select:{user:{username:true,id:true}}
+      })
+    }catch(e){
+      
+    }
+    
+  }
+
+  // 
+
+
 
 
 
