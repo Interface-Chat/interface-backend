@@ -26,8 +26,8 @@ export class UserTagService {
       usertag.tag = await this.tagRepositiry.findOne({
         where: { id: userTagDto.tagid },
       });
-      // if (!usertag.tag) return false;
-      // if (userTagDto.tagid == null) return false;
+      if (!usertag.tag) return false;
+      if (userTagDto.tagid == null) return false;
 
       // console.log(userTagDto)
       return await this.usertagRepositiry.save(usertag);

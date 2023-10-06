@@ -18,7 +18,6 @@ import { User } from '../entities/user.entity';
 import { RoleService } from 'src/modules/roles/services/role.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { CreaetUserType } from 'src/utils/types';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
 import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
@@ -88,17 +87,18 @@ export class UsersController {
     return user;
   }
 
+  //get a user by username
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('search/:username')
   async getOneUser(@Param('username') username: string) {
     const getUser = this.usersService.findOneUser(username);
     return getUser;
   }
+  // get user by id 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async getUserbyID(
     @Param('id', ParseIntPipe) id: number,
-    @Body() findUser: CreaetUserType,
   ) {
     return this.usersService.findUserByID(+id);
   }
@@ -108,7 +108,7 @@ export class UsersController {
 
   //Update User Information
   @UseGuards(JwtAuthGuard)
-  // @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch('updateinfo/:username')
   async updateUserInfo(
     @Param('id') id: number,

@@ -4,6 +4,8 @@ import { CreateUserTagDto } from '../dto/create-user_tag.dto';
 import { UserTag } from '../entities/user_tag.entity';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { log } from 'console';
+import { Roles } from 'src/modules/common/decorators/roles.decorator';
+import { ERole } from 'src/modules/roles/role.enum';
 // import { UpdateUserTagDto } from '../dto/update-user_tag.dto';
 
 @Controller('usertag')
@@ -55,10 +57,11 @@ export class UserTagController {
 
 
   // Get all user by tag
+  @UseGuards(JwtAuthGuard)
+  @Roles(ERole.Admin)
   @Get(':name')
   async getUserBytag(@Param('name')name:string){
     console.log(name);
-    
     return await this.userTagService.selectBytag(name);
   }
 }

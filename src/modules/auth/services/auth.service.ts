@@ -2,10 +2,10 @@ import { BadRequestException, Injectable} from '@nestjs/common';
 import { UserLoginDto } from '../dtos/user_login.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { ChangePassWordType} from 'src/utils/types';
 import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
+import { ChangePassWord } from '../dtos/password_reset.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +40,7 @@ export class AuthService {
     }
 
     //update password 
-    async changePassword(id:number,changePassword:ChangePassWordType){
+    async changePassword(id:number,changePassword:ChangePassWord){
         const {new_password , password} =changePassword;
         const user = await this.usersService.findUserByID(+id)
         if(!await user.validatePassword(password)){

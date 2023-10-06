@@ -2,18 +2,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BeforeInsert, Repository, UpdateResult } from 'typeorm';
 import { User } from '../entities/user.entity';
-import {
-  CreaetUserType,
-  ReturnUserDetail,
-  UpdateUserType,
-  UserByIdType,
-} from 'src/utils/types';
+// import {
+//   CreaetUserType,
+//   ReturnUserDetail,
+//   UpdateUserType,
+//   UserByIdType,
+// } from 'src/utils/types';
 import { Role } from '../../roles/entities/role.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
 import { UploadFileService } from 'src/modules/uploadfile/services/upload_file.service';
 import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
 import { Observable, from } from 'rxjs';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -30,8 +31,10 @@ export class UsersService {
     });
     return findUsers;
   }
+  
 
   async createUser(createuserDto: CreateUserDto) {
+    // const ExistingUsername = await this.usersRepositiry.exist
     try {
       const user = new User();
       user.roles = await this.roleRepositiry.findOne({
@@ -137,7 +140,7 @@ export class UsersService {
   }
 
   //update userinfo
-  async updateUsersInfo(id: number, updateUserInfo: UpdateUserType) {
+  async updateUsersInfo(id: number, updateUserInfo:UpdateUserDto) {
     // await this.findOneUser(username);
     await this.findUserByID(+id);
 
@@ -158,6 +161,7 @@ export class UsersService {
   deleteUserById(id: number) {
     return this.usersRepositiry.delete(id);
   }
+  // delete by username
   deleteUserByusername(username: string) {
     return this.usersRepositiry.delete(username);
   }
@@ -173,7 +177,7 @@ export class UsersService {
     return createUsers;
   }
 
-  //upload image
+  //upload image no working now
   updateUserImageById(id: number, imagePath: string): Observable<UpdateResult> {
     const user = new User();
     user.id = id;

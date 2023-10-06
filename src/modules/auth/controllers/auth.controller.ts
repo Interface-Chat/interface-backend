@@ -50,8 +50,8 @@ export class AuthController {
 
   //Get profile
   @UseGuards(JwtAuthGuard)
-  @Roles(ERole.Teacher,ERole.Student)
-  @UseGuards(RolesGuard)
+  // @Roles(ERole.Teacher,ERole.Student)
+  // @UseGuards(RolesGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('profile')
   async getProfile(@Request() req) {
@@ -75,10 +75,11 @@ export class AuthController {
   @Roles(ERole.Teacher,ERole.Student,ERole.Staff)
   @Patch('change_password/:id')
   async changePassword(
+    @Request() req,
     @Param('id') id: number,
-
     @Body() changePasswordDto: ChangePassWord,
   ) {
+     id =req.user.id
     await this.authService.changePassword(+id, changePasswordDto);
     return 'changed';
   }

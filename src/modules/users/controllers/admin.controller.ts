@@ -18,7 +18,6 @@ import {
   import { RoleService } from 'src/modules/roles/services/role.service';
   import { UpdateUserDto } from '../dto/update-user.dto';
   import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-  import { CreaetUserType } from 'src/utils/types';
   import { AdminUpdateUserDto } from '../dto/AdminUpdate.dto';
 import { LocalAuthGuard } from 'src/modules/auth/guards/local-auth.guard';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
@@ -35,8 +34,8 @@ import { ERole } from 'src/modules/roles/role.enum';
     ) {}
   
     //CREATE
-    @UseGuards(JwtAuthGuard)
-    @Roles(ERole.Admin)
+    // @UseGuards(JwtAuthGuard)
+    // @Roles(ERole.Admin)
     @Post(`create`)
     async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
       const createuser = await this.usersService.createUser(createUserDto);
@@ -86,29 +85,31 @@ import { ERole } from 'src/modules/roles/role.enum';
       return getUser;
     }
 
+    
+
+    //admin need to input to find a user
     @UseGuards(JwtAuthGuard)
     @Roles(ERole.Admin)
     @Get(':id')
     async getUserbyID(
       @Param('id', ParseIntPipe) id: number,
-      @Body() findUser: CreaetUserType,
+      // @Body() findUser: CreateUserDto,
     ) {
       return this.usersService.findUserByID(+id);
     }
   
     //Update User Information
     // @UseGuards(JwtAuthGuard)
-    @Roles(ERole.Admin)
-    @UseGuards(JwtAuthGuard)
-    @Patch('updateinfo/:id')
-    async updateUserInfo(
-      @Param('id') id: number,
-      @Body() updateInfo: UpdateUserDto,
-      @Request() req
-    ) {
-      await this.usersService.updateUsersInfo(req.user.id, updateInfo);
-      return 'updated';
-    }
+    // @Roles(ERole.Admin)
+    // @Patch('updateinfo/:id')
+    // async updateUserInfo(
+    //   @Param('id') id: number,
+    //   @Body() updateInfo: UpdateUserDto,
+    //   // @Request() req
+    // ) {
+    //   await this.usersService.updateUsersInfo(id, updateInfo);
+    //   return 'updated';
+    // }
   
     //deletep a user
     @Roles(ERole.Admin)
@@ -116,7 +117,7 @@ import { ERole } from 'src/modules/roles/role.enum';
     @Delete('delete/:username')
     async deleteUser(@Param('username') username: string) {
       await this.usersService.deleteUserByusername(username);
-      
     }
+    //ge
   }
   
