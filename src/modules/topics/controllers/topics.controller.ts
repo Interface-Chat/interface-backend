@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, BadRequestException, Headers, Request, UseGuards } from '@nestjs/common';
 import { TopicsService } from '../services/topics.service';
 import { CreateTopicDto } from '../dto/create-topic.dto';
 import { UpdateTopicDto } from '../dto/update-topic.dto';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+// import {Request} from 'express'
 
 @Controller('topics')
 export class TopicsController {
@@ -15,6 +17,23 @@ export class TopicsController {
   @Get()
   findAll() {
     return this.topicsService.findAll();
+  }
+  // @Get('listTopics')
+  // async listTopics(@Headers('userId') userId: string) {
+  //   return await this.topicsService.listTopicsOfUser(+userId)
+  // }
+
+  @Get('listTopicsByToken')
+  async listTopicsByToken(@Headers('authorization') authorization: string) {
+    return await this.topicsService.listTopicsByToken(authorization)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('listTopics')
+  async listTopics(@Request() req) {
+    const topics = await this.topicsService.listTopicsOfUser(req.user.userId);
+
+    return topics;
   }
 
   @Get(':id')

@@ -7,11 +7,14 @@ import { CreateTopicDto } from '../dto/create-topic.dto';
 import { UpdateTopicDto } from '../dto/update-topic.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
 
+import { JwtService } from '@nestjs/jwt';
+
 @Injectable()
 export class TopicsService {
   constructor(
     @InjectRepository(Topic)
     private topicRepository: Repository<Topic>,
+    private readonly jwtService: JwtService,
     // private readonly userService: UsersService,
     // @InjectRepository(UserToTopic) // Inject the UserToTopic repository
     // private readonly userToTopicRepository: Repository<UserToTopic>,
@@ -56,5 +59,36 @@ export class TopicsService {
   async remove(id: number) {
     await this.topicRepository.delete(id);
     return { deleted: true };
+  }
+
+  async listTopicsOfUser(userId: number) {
+    
+    var query = this.topicRepository.createQueryBuilder("topic")
+    .leftJoinAndSelect("topic.userToTopics", "user_to_topic")
+    .leftJoinAndSelect("user_to_topic.user", "user")
+    .where("user.id = :userId", {userId: userId});
+    
+    var topics = await query.getMany()
+    return topics;
+  }
+  async listTopicsByToken(authorizationToken: string) {
+    // Verify and decode the JWT token using the JwtService
+    const decodedToken = this.jwtService.verify(authorizationToken);
+
+    // Extract the user ID from the decoded token
+    const userId = decodedToken.userId;
+
+    if (!userId) {
+      throw new Error('Invalid or expired token');
+    }
+    // Now, you can fetch topics for the user with the extracted userId
+    // const query = this.topicRepository.createQueryBuilder('topic')
+    //   .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+    //   .leftJoinAndSelect('user_to_topic.user', 'user')
+    //   .where('user.id = :userId', { userId });
+
+
+    const topics = await this.listTopicsOfUser(userId);
+    return topics;
   }
 }
