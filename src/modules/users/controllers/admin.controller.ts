@@ -34,8 +34,8 @@ import { ERole } from 'src/modules/roles/role.enum';
     ) {}
   
     //CREATE
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(ERole.Admin)
+    @UseGuards(JwtAuthGuard)
+    @Roles(ERole.Admin)
     @Post(`create`)
     async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
       const createuser = await this.usersService.createUser(createUserDto);

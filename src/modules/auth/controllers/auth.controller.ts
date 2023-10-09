@@ -43,7 +43,7 @@ export class AuthController {
   // @UseGuards(RolesGuard)
   @Post('login')
   async login(@Body() authloginDto: UserLoginDto) {
-    // console.log(authloginDto);
+    console.log(authloginDto);
     
     return this.authService.login(authloginDto);
   }
@@ -55,6 +55,8 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('profile')
   async getProfile(@Request() req) {
+    console.log(req.user);
+    
     return req.user;
   }
 

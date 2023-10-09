@@ -19,7 +19,7 @@ import { UploadFileModule } from '../uploadfile/upload_file.module';
       imports: [ConfigModule],
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '6000s' },
       }),
       inject: [ConfigService],
     }),

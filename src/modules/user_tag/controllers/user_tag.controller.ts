@@ -63,12 +63,12 @@ export class UserTagController {
     return await this.userTagService.selectBytag(name);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Roles(ERole.Teacher)
-  async roleSeleteUserBytag(@Request()req){
-    return await this.userTagService.roleSelectBytag(req.user_tag.name)
+  // @UseGuards(JwtAuthGuard)
+  // @Roles(ERole.Teacher)
+  // async roleSeleteUserBytag(@Request()req){
+  //   return await this.userTagService.roleSelectBytag(req.user_tag.name)
 
-  }
+  // }
 
 
   

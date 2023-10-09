@@ -21,7 +21,6 @@ export class AuthService {
         console.log(isvalid);
         
         // const payload = isvalid;
-
         return {
             access_token: this.jwtService.sign({
                 payload: isvalid,

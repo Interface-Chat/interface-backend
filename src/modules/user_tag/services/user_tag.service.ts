@@ -15,7 +15,7 @@ export class UserTagService {
     @InjectRepository(User) private userRepositiry: Repository<User>,
     @InjectRepository(UserTag) private usertagRepositiry: Repository<UserTag>,
     @InjectRepository(Tag) private tagRepositiry: Repository<Tag>,
-    private tagService:TagsService,
+    // private tagService:TagsService,
 
   ) {}
 
@@ -93,20 +93,20 @@ export class UserTagService {
 
 
   //for role select 
-  async roleSelectBytag(name:string){
-    const check = await this.tagService.validatetag(name);
-    try{
-      if(!check) return false;
-      return await this.usertagRepositiry.find({
-        where:{tag:{name:name}},
-        relations:{user:true},
-        select:{user:{username:true,id:true}}
-      })
-    }catch(e){
+  // async roleSelectBytag(name:string){
+  //   const check = await this.tagService.validatetag(name);
+  //   try{
+  //     if(!check) return false;
+  //     return await this.usertagRepositiry.find({
+  //       where:{tag:{name:name}},
+  //       relations:{user:true},
+  //       select:{user:{username:true,id:true}}
+  //     })
+  //   }catch(e){
       
-    }
+  //   }
     
-  }
+  // }
 
   // 
 
