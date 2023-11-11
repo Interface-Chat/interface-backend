@@ -16,8 +16,8 @@ export class ChatService {
     private readonly roomRepository: Repository<Topic>,
   ) {}
 
-  async saveMessage(topicId: any, username: string, message?: string, attach?: string): Promise<TopicContent> {
-    const user = await this.userRepository.findOne({ where: { username } });
+  async saveMessage(topicId: any, id: any, message?: string, attach?: string): Promise<TopicContent> {
+    const user = await this.userRepository.findOne({ where: { id: id } });
     const topic = await this.roomRepository.findOne({ where: { id: topicId } });
 
     if (!user) {

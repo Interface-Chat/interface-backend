@@ -20,7 +20,8 @@ export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
 
   @SubscribeMessage('handleJoinTopic')
-  async handleJoinRoom(client: Socket, data: {topicId: any}) {
+  async handleJoinTopic(client: Socket, data: {topicId: any}) {
+    // console.log('Server: handleJoinRoom event received');
     const { topicId } = data;
     client.join(topicId);
 
@@ -35,11 +36,11 @@ export class ChatGateway {
     }
   }
 
-  @SubscribeMessage('handleChatMessage')
-  async handleChatMessage(client: Socket, data: { topic: string; username: string; message?: string; attach?: string }) {
+  @SubscribeMessage('handleChatMessages')
+  async handleChatMessages(client: Socket, data: { topic: string; id: string; message?: string; attach?: string }) {
     try {
-      const { topic, username, message, attach } = data;
-      const savedMessage = await this.chatService.saveMessage(topic, username, message, attach);
+      const { topic, id, message, attach } = data;
+      const savedMessage = await this.chatService.saveMessage(topic, id, message, attach);
       
       this.server.to(topic).emit('chat', savedMessage);
     } catch (error) {
