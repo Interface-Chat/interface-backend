@@ -1,1 +1,6 @@
-export class CreateUserTagDto {}
+
+export class CreateUserTagDto {
+    userid:any;
+    tagid:any;
+}
+

@@ -1,34 +1,75 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request,UseInterceptors, ClassSerializerInterceptor, UseGuards } from '@nestjs/common';
 import { UserTagService } from '../services/user_tag.service';
 import { CreateUserTagDto } from '../dto/create-user_tag.dto';
-import { UpdateUserTagDto } from '../dto/update-user_tag.dto';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { Roles } from 'src/modules/common/decorators/roles.decorator';
+import { ERole } from 'src/modules/roles/role.enum';
+// import { UpdateUserTagDto } from '../dto/update-user_tag.dto';
 
-@Controller('user-tag')
+@Controller('usertag')
 export class UserTagController {
   constructor(private readonly userTagService: UserTagService) {}
 
-  @Post()
-  create(@Body() createUserTagDto: CreateUserTagDto) {
-    return this.userTagService.create(createUserTagDto);
+
+
+  
+  // @UseInterceptors(ClassSerializerInterceptor)
+  // @UseGuards(JwtAuthGuard)
+  // @Post('create')
+  // async createUser(
+  // @Body()tagUserDto:CreateUserTagDto,
+  // @Request() req
+
+  // ){
+  //   console.log(tagUserDto)
+  //    tagUserDto.userid = req.user.id;
+  //    const userTag=await this.userTagService.createUserTag(tagUserDto);
+  //    return userTag;
+  
+  // }
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('create')
+  async createUser(
+  @Body()tagUserDto:CreateUserTagDto,
+  ){
+    console.log(tagUserDto)
+     const userTag=await this.userTagService.createUserTag(tagUserDto);
+
+      console.log(userTag);
+      
+     return userTag;
+  
   }
 
-  @Get()
-  findAll() {
-    return this.userTagService.findAll();
+  @Get('list')
+  async listUsertag(){
+    return await this.userTagService.findUserTag();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userTagService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get('auser')
+  async selectAUser(@Request() req){
+    return await this.userTagService.selectAUser(req.user.id);
+
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserTagDto: UpdateUserTagDto) {
-    return this.userTagService.update(+id, updateUserTagDto);
+
+  // Get all user by tag
+  @UseGuards(JwtAuthGuard)
+  @Roles(ERole.Admin)
+  @Get(':name')
+  async getUserBytag(@Param('name')name:string){
+    console.log(name);
+    return await this.userTagService.selectBytag(name);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userTagService.remove(+id);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Roles(ERole.Teacher)
+  // async roleSeleteUserBytag(@Request()req){
+  //   return await this.userTagService.roleSelectBytag(req.user_tag.name)
+
+  // }
+
+
+  
 }

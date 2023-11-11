@@ -1,34 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { RolesService } from '../services/roles.service';
-import { CreateRoleDto } from '../dto/create-role.dto';
-import { UpdateRoleDto } from '../dto/update-role.dto';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Patch, Post } from '@nestjs/common';
+import { RoleService } from '../services/role.service';
+import { RoleDto } from '../dtos/roles.dto';
+import { Role } from '../entities/role.entity';
 
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+    constructor(
+      private readonly roleService: RoleService,
+        
+    ){}
 
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
-  }
+    @Post('create')
+    async createRoleUser(@Body()role:RoleDto){
+        await this.roleService.createRole(role);
+    }
+    @Get('get')
+    async getRole(@Body()role:RoleDto){
+      
+    }
+    @Patch('update')
+    async updateRole(@Body()role:RoleDto){
 
-  @Get()
-  findAll() {
-    return this.rolesService.findAll();
-  }
+    }
+    @Delete('delete')
+    async deleteRole(@Body()role:RoleDto){
+      
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
-  }
+    
+  //   @Post('create-roles')
+  // async createRole(@Body() roleDto: RoleDto): Promise<Role> {
+  //   try {
+  //     const createdRole = await this.roleService.createRole(roleDto);
+  //     return createdRole;
+  //   } catch (error) {
+  //     if (error instanceof HttpException) {
+  //       throw error;
+  //     } else {
+  //       throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
-  }
+    
+    
 }
