@@ -20,7 +20,7 @@ export class User extends BaseEntity{
   @Column({ nullable: true })
   mobile: string;
 
-  @Column({ type: 'date' }) // This defines a "date of birth" field
+  @Column({ type: 'date', nullable: true }) // This defines a "date of birth" field
   dateOfBirth: Date;
  
   @Column({})
