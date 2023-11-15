@@ -31,7 +31,9 @@ export class TopicsController {
   @UseGuards(JwtAuthGuard)
   @Get('listTopics')
   async listTopics(@Request() req) {
-    const topics = await this.topicsService.listTopicsOfUser(req.user.userId);
+    console.log(req.user);
+    
+    const topics = await this.topicsService.listTopicsOfUser(req.user.payload.id);
 
     return topics;
   }

@@ -1,4 +1,4 @@
-import { BadRequestException, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Request, BadRequestException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -7,6 +7,9 @@ import {
 import { Socket, Server } from 'socket.io';
 import { WebsocketsExceptionFilter } from '../ws-exception.filter';
 import { ChatService } from '../services/chat.service';
+import { TopicsService } from 'src/modules/topics/services/topics.service';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { AuthService } from 'src/modules/auth/services/auth.service';
 
 @WebSocketGateway({
   cors: {
@@ -17,8 +20,12 @@ import { ChatService } from '../services/chat.service';
 export class ChatGateway {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService,
+    private readonly topicsService: TopicsService,
+    private readonly authService: AuthService,
+    ) {}
 
+  
   @SubscribeMessage('handleJoinTopic')
   async handleJoinTopic(client: Socket, data: {topicId: any}) {
     // console.log('Server: handleJoinRoom event received');
@@ -36,18 +43,103 @@ export class ChatGateway {
     }
   }
 
+  // @SubscribeMessage('handleChatMessages')
+  // async handleChatMessages(client: Socket, data: { topic: string; id: string; message?: string; attach?: string }) {
+  //   try {
+  //     const { topic, id, message, attach } = data;
+  //     const savedMessage = await this.chatService.saveMessage(topic, id, message, attach);
+      
+  //     this.server.to(topic).emit('chat', savedMessage);
+  //   } catch (error) {
+  //     client.emit('error', 'Message sending failed');
+  //   }
+  // }
+  // @SubscribeMessage('handleChatMessages')
+  // async handleChatMessages(client: Socket, data: { topic: string; id: string; message?: string; attach?: string }) {
+  //   try {
+  //     const { topic, id, message, attach } = data;
+  //     const savedMessage = await this.chatService.saveMessage(topic, id, message, attach);
+      
+  //     // Get the latest updates after saving the message
+  //     const latestUpdates = await this.chatService.getLatestUpdates(topic);
+      
+  //     // Emit the latest updates and the new message to all clients in the topic room
+  //     this.server.to(topic).emit('latestUpdates', { topicId: topic, updates: latestUpdates });
+  //     this.server.to(topic).emit('chat', savedMessage);
+  //   } catch (error) {
+  //     client.emit('error', 'Message sending failed');
+  //   }
+  // }
+
   @SubscribeMessage('handleChatMessages')
-  async handleChatMessages(client: Socket, data: { topic: string; id: string; message?: string; attach?: string }) {
+  async handleChatMessages(client: Socket, data: { topic: string; id: number; message?: string; attach?: string }) {
     try {
       const { topic, id, message, attach } = data;
+
+      // Save the message
       const savedMessage = await this.chatService.saveMessage(topic, id, message, attach);
-      
+
+      // Emit the message to all clients in the same room
       this.server.to(topic).emit('chat', savedMessage);
+
     } catch (error) {
       client.emit('error', 'Message sending failed');
     }
   }
+
+  @SubscribeMessage('handleUserConnection')
+  async handleUserConnection(client: Socket, data: {token: any}) {
+
+    const { token } = data;
+    const payload = await this.authService.verify(token);
+    
+    console.log("payload:" + payload.payload.id);
+    
+    try {
+      const userId = payload.payload.id;
+      // Fetch and listen to topics for the user
+      const userTopics = await this.topicsService.listTopicsOfUser(userId);
+
+      // Join each topic room
+      userTopics.forEach((topic) => {
+        client.join(topic.id.toString());
+      });
+
+      // Respond with the list of topics (optional)
+      client.emit('userTopics', userTopics);
+    } catch (error) {
+      console.log(error);
+      
+      client.emit('error', 'Failed to fetch user topics');
+    }
+  }
+
+  // @SubscribeMessage('handleUserConnection')
+  // async handleUserConnection(client: Socket, data: { userId: any }) {
+  //   try {
+  //     const { userId } = data;
+      
+  //     // Fetch user topics
+  //     const userTopics = await this.chatService.getUserTopics(userId);
+      
+  //     // Subscribe the client to each user topic
+  //     userTopics.forEach((topic) => client.join(topic.id));
+
+  //     // Send the list of user topics to the client
+  //     client.emit('userTopics', userTopics);
+
+  //     // Fetch latest updates for each user topic
+  //     userTopics.forEach(async (topic) => {
+  //       const latestUpdates = await this.chatService.getLatestUpdates(topic.id);
+  //       client.emit('latestUpdates', { topicId: topic.id, updates: latestUpdates });
+  //     });
+  //   } catch (error) {
+  //     client.emit('error', 'Failed to connect and fetch user data');
+  //   }
+  // }
+
 }
+
 // // V1
 // import { BadRequestException, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 // import {

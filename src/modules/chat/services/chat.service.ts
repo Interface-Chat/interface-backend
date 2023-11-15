@@ -16,6 +16,15 @@ export class ChatService {
     private readonly roomRepository: Repository<Topic>,
   ) {}
 
+  // async getLatestUpdates(topicId: string): Promise<Topic[]> {
+  //   // Assuming you have an 'Update' entity and a 'created_at' column
+  //   return this.roomRepository.find({
+  //     where: { topicId },
+  //     order: { created_at: 'DESC' }, // Fetch updates in descending order of creation
+  //     take: 10, // Adjust the number based on how many updates you want to retrieve
+  //   });
+  // }
+
   async saveMessage(topicId: any, id: any, message?: string, attach?: string): Promise<TopicContent> {
     const user = await this.userRepository.findOne({ where: { id: id } });
     const topic = await this.roomRepository.findOne({ where: { id: topicId } });
@@ -40,6 +49,7 @@ export class ChatService {
       chat.message = message;
     }
     await this.chatRepository.save(chat);
+    await this.roomRepository.update(topic.id, { updated_at: new Date() });
     // chat.user = chat.topic = null;
     return chat
   }

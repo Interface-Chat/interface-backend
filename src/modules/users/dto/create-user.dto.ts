@@ -37,7 +37,7 @@ export class CreateUserDto {
 
   // CreateAT:Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   role_id: any;
 
   

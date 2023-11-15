@@ -39,7 +39,7 @@ export class User extends BaseEntity{
   @UpdateDateColumn()
   UpdateAT:Date;
 
-  @ManyToOne(() => Role, (role) => role.id,{cascade:true})
+  @ManyToOne(() => Role, (role) => role.id,{cascade:true, nullable: true})
   roles: Role;
 
   @OneToMany(() => UserToTopic, (userToTopic) => userToTopic.user)

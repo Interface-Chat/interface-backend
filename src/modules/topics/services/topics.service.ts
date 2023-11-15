@@ -61,16 +61,62 @@ export class TopicsService {
     return { deleted: true };
   }
 
+  // async listTopicsOfUser(userId: number) {
+    
+  //   var query = this.topicRepository.createQueryBuilder("topic")
+  //   .leftJoinAndSelect("topic.userToTopics", "user_to_topic")
+  //   .leftJoinAndSelect("user_to_topic.user", "user")
+  //   .where("user.id = :userId", {userId: userId});
+    
+  //   var topics = await query.getMany()
+  //   return topics;
+  // }
+
+  // // V1
+  // async listTopicsOfUser(userId: number) {
+  //   const query = this.topicRepository.createQueryBuilder('topic')
+  //     .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+  //     .leftJoinAndSelect('user_to_topic.user', 'user')
+  //     .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+  //     .leftJoinAndSelect('tag_topic.tag', 'tag')
+  //     .where('user.id = :userId', { userId });
+  
+  //   const topics = await query.getMany();
+  //   return topics;
+  // }
+
+  // //v2
+  // async listTopicsOfUser(userId: number) {
+  //   const query = this.topicRepository.createQueryBuilder('topic')
+  //     .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+  //     .leftJoinAndSelect('user_to_topic.user', 'user')
+  //     .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+  //     .leftJoinAndSelect('tag_topic.tag', 'tag')
+  //     .leftJoinAndSelect('tag.userToTag', 'user_to_tag')  // Assuming 'user_to_tag' is the alias for the UserTag entity
+  //     .where('(user.id = :userId OR user_to_tag.user.id = :userId)', { userId });
+  
+  //   const topics = await query.getMany();
+  //   return topics;
+  // }
+  
+  //v3
   async listTopicsOfUser(userId: number) {
-    
-    var query = this.topicRepository.createQueryBuilder("topic")
-    .leftJoinAndSelect("topic.userToTopics", "user_to_topic")
-    .leftJoinAndSelect("user_to_topic.user", "user")
-    .where("user.id = :userId", {userId: userId});
-    
-    var topics = await query.getMany()
+      const query = this.topicRepository.createQueryBuilder('topic')
+      .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+      .leftJoinAndSelect('user_to_topic.user', 'user')
+      .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+      .leftJoinAndSelect('tag_topic.tag', 'tag')
+      .leftJoinAndSelect('tag.userToTag', 'user_to_tag')  // Assuming 'user_to_tag' is the alias for the UserTag entity
+      .where('(user.id = :userId OR user_to_tag.user.id = :userId)', { userId })
+      .orderBy('topic.updated_at', 'DESC');
+  
+    const topics = await query
+      .select(['topic.id', 'topic.title', 'topic.updated_at'])
+      .getMany();
+  
     return topics;
   }
+  
   async listTopicsByToken(authorizationToken: string) {
     // Verify and decode the JWT token using the JwtService
     const decodedToken = this.jwtService.verify(authorizationToken);

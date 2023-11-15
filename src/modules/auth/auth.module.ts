@@ -8,10 +8,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './guards/jwt.strategy.guard';
 import { LocalStrategy } from './guards/local.strategy';
 import { UploadFileModule } from '../uploadfile/upload_file.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Tag } from '../tags/entities/tag.entity';
 
 
 @Module({
   imports:[
+    TypeOrmModule.forFeature([Tag]),
     UploadFileModule,
     UsersModule,
     PassportModule,
@@ -25,6 +28,7 @@ import { UploadFileModule } from '../uploadfile/upload_file.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService,LocalStrategy,JwtStrategy]
+  providers: [AuthService,LocalStrategy,JwtStrategy],
+  exports:[AuthService],
 })
 export class AuthModule {}

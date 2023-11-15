@@ -56,8 +56,10 @@ export class AuthController {
   @Get('profile')
   async getProfile(@Request() req) {
     console.log(req.user);
-    
-    return req.user;
+    const displayName = req.user.payload.fullName ? `${req.user.payload.fullName} (${req.user.payload.username})` : req.user.payload.username;
+    const responseData = { data: {...req.user.payload, displayName} };
+
+  return responseData;
   }
 
   //update user this => call from authservice <= from userservice
