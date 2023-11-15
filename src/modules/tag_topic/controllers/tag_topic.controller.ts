@@ -22,10 +22,6 @@ export class TagTopicController {
     return this.tagTopicService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTagTopicDto: UpdateTagTopicDto) {
-    return this.tagTopicService.update(+id, updateTagTopicDto);
-  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

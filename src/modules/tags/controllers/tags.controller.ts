@@ -17,6 +17,11 @@ export class TagsController {
 
   }
 
+  @Get()
+  async findAll() {
+    return { data: await this.tagsService.findAll()};
+  }
+
   
   // @Post('create')
   // create(@Body() createTagDto: CreateTagDto) {

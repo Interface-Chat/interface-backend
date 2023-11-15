@@ -84,7 +84,7 @@ export class UsersController {
   @Get('list')
   async getUser() {
     const user = await this.usersService.findUsers();
-    return user;
+    return { data: user};
   }
 
   //get a user by username

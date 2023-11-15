@@ -36,4 +36,8 @@ export class TagsService {
     })
 
   }
+
+  async findAll() {
+    return await this.tagRepositiry.find();
+  }
 }
