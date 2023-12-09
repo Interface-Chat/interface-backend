@@ -1,26 +1,140 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Topic } from '../entities/topic.entity';
+import { UserToTopic } from 'src/modules/user_to_topic/entities/user_to_topic.entity';
 import { CreateTopicDto } from '../dto/create-topic.dto';
 import { UpdateTopicDto } from '../dto/update-topic.dto';
+import { UsersService } from 'src/modules/users/services/users.service';
+
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class TopicsService {
-  create(createTopicDto: CreateTopicDto) {
-    return 'This action adds a new topic';
+  constructor(
+    @InjectRepository(Topic)
+    private topicRepository: Repository<Topic>,
+    private readonly jwtService: JwtService,
+    // private readonly userService: UsersService,
+    // @InjectRepository(UserToTopic) // Inject the UserToTopic repository
+    // private readonly userToTopicRepository: Repository<UserToTopic>,
+  ) {}
+
+  // async createWithUsers(createTopicDto: CreateTopicDto, userIds: number[]) {
+  //   const topic = this.topicRepository.create(createTopicDto);
+  //   const savedTopic = await this.topicRepository.save(topic);
+
+  //   if (userIds && userIds.length > 0) {
+  //     const users = await this.userService.findByIds(userIds);
+
+  //     for (const user of users) {
+  //       const userToTopic = new UserToTopic();
+  //       userToTopic.user = user;
+  //       userToTopic.topic = savedTopic;
+  //       await this.userToTopicRepository.save(userToTopic);
+  //     }
+  //   }
+
+  //   return savedTopic;
+  // }  
+
+  async create(createTopicDto: CreateTopicDto) {
+    const topic = this.topicRepository.create(createTopicDto);
+    return await this.topicRepository.save(topic);
   }
 
-  findAll() {
-    return `This action returns all topics`;
+  async findAll() {
+    return await this.topicRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} topic`;
+  async findOne(id: number) {
+    return await this.topicRepository.findOne({where: {id: id}});
   }
 
-  update(id: number, updateTopicDto: UpdateTopicDto) {
-    return `This action updates a #${id} topic`;
+  async update(id: number, updateTopicDto: UpdateTopicDto) {
+    await this.topicRepository.update(id, updateTopicDto);
+    return await this.topicRepository.findOne({where: {id: id}});
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} topic`;
+  async remove(id: number) {
+    await this.topicRepository.delete(id);
+    return { deleted: true };
+  }
+
+  // async listTopicsOfUser(userId: number) {
+    
+  //   var query = this.topicRepository.createQueryBuilder("topic")
+  //   .leftJoinAndSelect("topic.userToTopics", "user_to_topic")
+  //   .leftJoinAndSelect("user_to_topic.user", "user")
+  //   .where("user.id = :userId", {userId: userId});
+    
+  //   var topics = await query.getMany()
+  //   return topics;
+  // }
+
+  // // V1
+  // async listTopicsOfUser(userId: number) {
+  //   const query = this.topicRepository.createQueryBuilder('topic')
+  //     .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+  //     .leftJoinAndSelect('user_to_topic.user', 'user')
+  //     .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+  //     .leftJoinAndSelect('tag_topic.tag', 'tag')
+  //     .where('user.id = :userId', { userId });
+  
+  //   const topics = await query.getMany();
+  //   return topics;
+  // }
+
+  // //v2
+  // async listTopicsOfUser(userId: number) {
+  //   const query = this.topicRepository.createQueryBuilder('topic')
+  //     .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+  //     .leftJoinAndSelect('user_to_topic.user', 'user')
+  //     .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+  //     .leftJoinAndSelect('tag_topic.tag', 'tag')
+  //     .leftJoinAndSelect('tag.userToTag', 'user_to_tag')  // Assuming 'user_to_tag' is the alias for the UserTag entity
+  //     .where('(user.id = :userId OR user_to_tag.user.id = :userId)', { userId });
+  
+  //   const topics = await query.getMany();
+  //   return topics;
+  // }
+  
+  //v3
+  async listTopicsOfUser(userId: number) {
+      const query = this.topicRepository.createQueryBuilder('topic')
+      .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+      .leftJoinAndSelect('user_to_topic.user', 'user')
+      .leftJoinAndSelect('topic.tagToTopics', 'tag_topic')
+      .leftJoinAndSelect('tag_topic.tag', 'tag')
+      .leftJoinAndSelect('tag.userToTag', 'user_to_tag')  // Assuming 'user_to_tag' is the alias for the UserTag entity
+      .where('(user.id = :userId OR user_to_tag.user.id = :userId)', { userId })
+      .orderBy('topic.updated_at', 'DESC');
+  
+    const topics = await query
+      .select(['topic.id', 'topic.title', 'topic.updated_at'])
+      .getMany();
+  
+    return topics;
+  }
+  
+  async listTopicsByToken(authorizationToken: string) {
+    // Verify and decode the JWT token using the JwtService
+    const decodedToken = this.jwtService.verify(authorizationToken);
+
+    // Extract the user ID from the decoded token
+    const userId = decodedToken.userId;
+
+    if (!userId) {
+      throw new Error('Invalid or expired token');
+    }
+    // Now, you can fetch topics for the user with the extracted userId
+    // const query = this.topicRepository.createQueryBuilder('topic')
+    //   .leftJoinAndSelect('topic.userToTopics', 'user_to_topic')
+    //   .leftJoinAndSelect('user_to_topic.user', 'user')
+    //   .where('user.id = :userId', { userId });
+
+
+    const topics = await this.listTopicsOfUser(userId);
+    return topics;
   }
 }
